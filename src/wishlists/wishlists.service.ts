@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
@@ -74,7 +78,14 @@ export class WishlistsService {
   async updateOne(
     query: FindOptionsWhere<Wishlist>,
     updateWishlistDto: UpdateWishlistDto,
+    userId: number,
   ): Promise<Wishlist> {
+    const wishlist = await this.findOne(query);
+
+    if (wishlist.owner.id !== userId) {
+      throw new ForbiddenException('Нельзя редактировать чужие списки желаний');
+    }
+
     const queryRunner =
       this.wishlistsRepository.manager.connection.createQueryRunner();
 
@@ -82,8 +93,6 @@ export class WishlistsService {
     await queryRunner.startTransaction();
 
     try {
-      const wishlist = await this.findOne(query);
-
       if (updateWishlistDto.itemsId) {
         wishlist.items = await this.wishesService.findManyByIds(
           updateWishlistDto.itemsId,
@@ -107,8 +116,16 @@ export class WishlistsService {
     }
   }
 
-  async removeOne(query: FindOptionsWhere<Wishlist>): Promise<Wishlist> {
+  async removeOne(
+    query: FindOptionsWhere<Wishlist>,
+    userId: number,
+  ): Promise<Wishlist> {
     const wishlist = await this.findOne(query);
+
+    if (wishlist.owner.id !== userId) {
+      throw new ForbiddenException('Нельзя удалять чужие списки желаний');
+    }
+
     return this.wishlistsRepository.remove(wishlist);
   }
 }

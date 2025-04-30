@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, In } from 'typeorm';
 import { UsersService } from '../users/users.service';
@@ -60,13 +64,27 @@ export class WishesService {
   async updateOne(
     query: FindOptionsWhere<Wish>,
     updateWishDto: UpdateWishDto,
+    userId: number,
   ): Promise<Wish> {
     const wish = await this.findOne(query);
+
+    if (wish.owner.id !== userId) {
+      throw new ForbiddenException('Нельзя редактировать чужие желания');
+    }
+
     return this.wishesRepository.save({ ...wish, ...updateWishDto });
   }
 
-  async removeOne(query: FindOptionsWhere<Wish>): Promise<Wish> {
+  async removeOne(
+    query: FindOptionsWhere<Wish>,
+    userId: number,
+  ): Promise<Wish> {
     const wish = await this.findOne(query);
+
+    if (wish.owner.id !== userId) {
+      throw new ForbiddenException('Нельзя удалять чужие желания');
+    }
+
     return this.wishesRepository.remove(wish);
   }
 

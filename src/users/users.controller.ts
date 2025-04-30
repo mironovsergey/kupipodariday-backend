@@ -17,7 +17,6 @@ import { UserProfileResponseDto } from './dto/user-profile-response.dto';
 import { UserPublicProfileResponseDto } from './dto/user-public-profile-response.dto';
 import { UserWishesDto } from './dto/user-wishes.dto';
 import { Wish } from '../wishes/entities/wish.entity';
-import { Like } from 'typeorm';
 
 @Controller('users')
 @UseGuards(JwtGuard)
@@ -62,9 +61,6 @@ export class UsersController {
   async findMany(
     @Body() findUsersDto: FindUsersDto,
   ): Promise<UserProfileResponseDto[]> {
-    return this.usersService.findMany([
-      { username: Like(`%${findUsersDto.query}%`) },
-      { email: Like(`%${findUsersDto.query}%`) },
-    ]);
+    return this.usersService.findMany(findUsersDto.query);
   }
 }

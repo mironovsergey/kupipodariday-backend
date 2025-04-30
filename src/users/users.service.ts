@@ -4,7 +4,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Repository, FindOptionsWhere, Like } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -68,9 +68,9 @@ export class UsersService {
     return user;
   }
 
-  async findMany(query: FindOptionsWhere<User>[]): Promise<User[]> {
+  async findMany(query: string): Promise<User[]> {
     return this.usersRepository.find({
-      where: query,
+      where: [{ username: Like(`%${query}%`) }, { email: Like(`%${query}%`) }],
       relations: ['wishes', 'wishlists', 'offers'],
     });
   }

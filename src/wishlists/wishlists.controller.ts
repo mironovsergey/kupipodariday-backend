@@ -9,7 +9,6 @@ import {
   Delete,
   UseGuards,
   HttpCode,
-  ForbiddenException,
 } from '@nestjs/common';
 import { AuthRequest } from '../auth/types/auth.request';
 import { JwtGuard } from '../auth/guards/jwt.guard';
@@ -51,13 +50,11 @@ export class WishlistsController {
     @Param('id') id: number,
     @Body() updateWishlistDto: UpdateWishlistDto,
   ): Promise<Wishlist> {
-    const wishlist = await this.wishlistsService.findOne({ id });
-
-    if (wishlist.owner.id !== req.user.id) {
-      throw new ForbiddenException('Нельзя обновлять чужие списки');
-    }
-
-    return this.wishlistsService.updateOne({ id }, updateWishlistDto);
+    return this.wishlistsService.updateOne(
+      { id },
+      updateWishlistDto,
+      req.user.id,
+    );
   }
 
   @Delete(':id')
@@ -66,12 +63,6 @@ export class WishlistsController {
     @Req() req: AuthRequest,
     @Param('id') id: number,
   ): Promise<Wishlist> {
-    const wishlist = await this.wishlistsService.findOne({ id });
-
-    if (wishlist.owner.id !== req.user.id) {
-      throw new ForbiddenException('Нельзя удалять чужие списки');
-    }
-
-    return this.wishlistsService.removeOne({ id });
+    return this.wishlistsService.removeOne({ id }, req.user.id);
   }
 }

@@ -9,7 +9,6 @@ import {
   Delete,
   UseGuards,
   HttpCode,
-  ForbiddenException,
 } from '@nestjs/common';
 import { AuthRequest } from '../auth/types/auth.request';
 import { JwtGuard } from '../auth/guards/jwt.guard';
@@ -19,11 +18,11 @@ import { UpdateWishDto } from './dto/update-wish.dto';
 import { Wish } from './entities/wish.entity';
 
 @Controller('wishes')
-@UseGuards(JwtGuard)
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
 
   @Post()
+  @UseGuards(JwtGuard)
   @HttpCode(201)
   async create(
     @Req() req: AuthRequest,
@@ -44,40 +43,32 @@ export class WishesController {
   }
 
   @Get(':id')
+  @UseGuards(JwtGuard)
   async findOne(@Param('id') id: number): Promise<Wish> {
     return this.wishesService.findOne({ id });
   }
 
   @Patch(':id')
+  @UseGuards(JwtGuard)
   async update(
     @Req() req: AuthRequest,
     @Param('id') id: number,
     @Body() updateWishDto: UpdateWishDto,
   ): Promise<Wish> {
-    const wish = await this.wishesService.findOne({ id });
-
-    if (wish.owner.id !== req.user.id) {
-      throw new ForbiddenException('Нельзя редактировать чужие хотелки');
-    }
-
-    return this.wishesService.updateOne({ id }, updateWishDto);
+    return this.wishesService.updateOne({ id }, updateWishDto, req.user.id);
   }
 
   @Delete(':id')
+  @UseGuards(JwtGuard)
   async removeOne(
     @Req() req: AuthRequest,
     @Param('id') id: number,
   ): Promise<Wish> {
-    const wish = await this.wishesService.findOne({ id });
-
-    if (wish.owner.id !== req.user.id) {
-      throw new ForbiddenException('Нельзя удалять чужие хотелки');
-    }
-
-    return this.wishesService.removeOne({ id });
+    return this.wishesService.removeOne({ id }, req.user.id);
   }
 
   @Post(':id/copy')
+  @UseGuards(JwtGuard)
   @HttpCode(201)
   async copyWish(
     @Param('id') id: number,
