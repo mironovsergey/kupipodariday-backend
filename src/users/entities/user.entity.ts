@@ -10,6 +10,7 @@ import { IsString, IsEmail, IsUrl, Length, IsOptional } from 'class-validator';
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 import { Offer } from '../../offers/entities/offer.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -44,6 +45,7 @@ export class User {
 
   @Column({ select: false })
   @IsString()
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @OneToMany(() => Wish, (wish) => wish.owner)
