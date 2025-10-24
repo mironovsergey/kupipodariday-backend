@@ -1,4 +1,4 @@
-import { OmitType } from '@nestjs/mapped-types';
+import { OmitType } from '@nestjs/swagger';
 import { Wish } from '../entities/wish.entity';
 
 export class CreateWishDto extends OmitType(Wish, [
