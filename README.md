@@ -1,7 +1,7 @@
 # КупиПодариДай
 
 [![Swagger](https://img.shields.io/badge/Swagger-UI-green?logo=swagger)](https://kupipodariday-backend.onrender.com/api)
-[![Frontend Demo](https://img.shields.io/badge/Frontend%20Demo-Render-6466E9?logo=render&logoColor=white)](https://nodejs-kupipodariday-frontend.onrender.com)
+[![Frontend: kupipodariday.netlify.app](https://img.shields.io/badge/Frontend-kupipodariday.netlify.app-brightgreen)](https://kupipodariday.netlify.app/)
 
 ## Описание проекта
 
